@@ -17,7 +17,7 @@ except:
 setup(
     name="giternity",
     version=__version__,
-    description=__doc__,
+    description=__doc__.strip(),
     long_description=long_description,
     url="https://github.com/rahiel/giternity",
     license="GPLv3+",

@@ -1,0 +1,22 @@
+# path for the git mirrors
+git_data_path = "/srv/git/"
+
+# path for checkouts of the git mirrors (optional)
+checkout_path = "/srv/git_checkout/"
+
+# suffix to use for naming repo directories (optional, default "")
+checkout_suffix = ".git"
+
+# public URL of your cgit instance (optional)
+cgit_url = "https://git.cpu.re/"
+
+# In the `[github]` section, specify which repositories to mirror.
+# Usernames (`"rahiel"`) or an organization (`"sunsistemo"`) to mirror all of their non-fork repositories.
+# Individual repos may be specified too as `owner/repo` (`"TeMPOraL/nyan-mode"`).
+
+[github]
+repositories = [
+    "rahiel",
+    "sunsistemo",
+    "TeMPOraL/nyan-mode",
+]

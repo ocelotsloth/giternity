@@ -26,45 +26,14 @@ import sys
 import logging as log
 
 from os.path import exists, join
-from pwd import getpwnam
-from subprocess import CalledProcessError, run
+from subprocess import run
 
 from colors import color
 import requests
 import toml
 
 
-__version__ = "0.3.2"
-
-
-def configure(git_data_path: str, checkout_path: str = None):
-    try:
-        try:
-            getpwnam("giternity")
-        except KeyError:
-            run(["adduser", "giternity", "--system", "--no-create-home"],
-                check=True)
-
-        for path in [git_data_path, checkout_path]:
-            if path:
-                run(["mkdir", "-p", path], check=True)
-                run(["chown", "-R", "giternity", path], check=True)
-
-        cron = """SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
-# m h dom mon dow user  command
-0 * * * * giternity giternity\n"""
-
-        with open("/etc/cron.d/giternity", "w") as f:
-            f.write(cron)
-
-    except (FileNotFoundError, PermissionError, CalledProcessError):
-        print("Please run the configuration with root privileges: " +
-              color("sudo giternity --configure", style="bold"))
-        sys.exit(1)
-
-    print(color("Everything is OK!", fg="green") + "\nHave fun using giternity!")
+__version__ = "0.4.0"
 
 
 def mirror(url: str, path: str):
@@ -179,10 +148,6 @@ parser = argparse.ArgumentParser(
   description="Mirror git repositories and retrieve metadata for cgit.",
   epilog="Homepage: https://github.com/rahiel/giternity")
 
-parser.add_argument("--configure",
-                    help="configure %(prog)s",
-                    action="store_true")
-
 parser.add_argument("--version",
                     action="version",
                     version="%(prog)s {}".format(__version__))
@@ -211,9 +176,6 @@ def main():
     checkout_path = config.get("checkout_path")
     cgit_url = config.get("cgit_url")
     checkout_suffix = config.get("checkout_suffix", "")
-
-    if args.configure:
-        return configure(git_data_path, checkout_path)
 
     if config.get("github") and config["github"].get("repositories"):
         gh = GitHub(cgit_url=cgit_url)

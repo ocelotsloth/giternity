@@ -18,72 +18,42 @@ An example result is [git.cpu.re][]. Follow the [tutorial][] to host your own.
 
 # Installation
 
-Install giternity:
+Giternity is packaged via PyPi, the Python Package Index.
+Required packages:
+- Python 3
+- Python 3 `pip` (if your distro packages it separately)
+- git
 
 ``` shell
 sudo pip3 install giternity
 ```
 
-You also need to have git installed.
-
 # Configuration
 
-The configuration file by default is at `/etc/giternity.toml`:
-<!-- TODO: ini should be toml when pygments has toml support -->
-```ini
-# path for the git mirrors
-git_data_path = "/srv/git/"
+The configuration file by default is located at `/etc/giternity.toml`.
+See the example [giternity.toml](/examples/giternity.toml) for a list of all options.
 
-# path for checkouts of the git mirrors (optional)
-# checkout_path = "/srv/git_checkout/"
+With the configuration in place you simply run `giternity`, or `giternity -c $YOUR_CONFIG_FILE` if you want to place it somewhere else.
 
-# suffix to use for naming repo directories (optional)
-# checkout_suffix = ".git"
+## cron
 
-# public URL of your cgit instance (optional)
-# cgit_url = "https://git.cpu.re/"
+Giternity is intended for use as an unsupervised cron.
+See the example [giternity.cron](/examples/giternity.cron) for a possible `/etc/cron.d/giternity`.
 
-[github]
-repositories = [
-    "rahiel",
-    "sunsistemo",
-    "TeMPOraL/nyan-mode",
-]
-```
+Note that it is recommended to run Giternity as an unprivileged or "sandbox" user if possible.
+For example one could have a `git-data` group which owns the `/srv/git` data directory.
+`http` (for cgit), `git` (for gitosis, gitolite or just bare git-shell) and `giternity` could all be group members.
 
-Set `git_data_path` to the path where you want to store the git
-repositories. It will contain bare git repositories: the data you
-usually see in the `.git` directory in your projects. To also have the
-actual working files of the repos, set `checkout_path` to where to
-keep them. If you'll be hosting the repos with cgit, set `cgit_url` to
-the public URL.
-
-In the `[github]` section you specify which repositories to mirror. You list a
-username (`"rahiel"`) or an organization (`"sunsistemo"`) to mirror all of their
-non-fork repositories. For individual repos (`"TeMPOraL/nyan-mode"`) you specify
-them like `owner/repo`.
-
-With the configuration in place you simply run `giternity`.
-
-For convenience there is an automatic configuration that sets up a separate
-system user, gives this user permissions to `git_data_path` (and to
-`checkout_path` if specified) and creates a cron job at `/etc/cron.d/giternity`
-to update the mirrors every hour. Apply these defaults with:
-
-``` shell
-sudo giternity --configure
-```
-
-# cgit
+## cgit
 
 Your git mirrors are now suitable to serve with cgit. Customize your
 `/etc/cgitrc` as you like and add the following to the bottom:
 
-``` ini
-agefile=info/web/last-modified
-section-from-path=1
+```ini
+# the giternity git_data_path as you configured it
 scan-path=/srv/git/
+# giternity writes this file to track the last-modified date of mirroed repos
+agefile=info/web/last-modified
+# infer section (github user / group) from the first repo path segment
+section-from-path=1
 ```
-
-where you replace `/srv/git/` with the `git_data_path` from your
-`/etc/giternity.toml`.

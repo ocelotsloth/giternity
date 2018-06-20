@@ -161,7 +161,7 @@ parser.add_argument("-c", "--config",
 def main():
     args = parser.parse_args()
 
-    log.basicConfig(level=log.DEBUG,
+    log.basicConfig(level=log.INFO,
                     format='%(name)-12s: %(levelname)-8s %(message)s')
 
     try:

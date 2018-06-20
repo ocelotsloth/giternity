@@ -161,6 +161,8 @@ parser.add_argument("-c", "--config",
 def main():
     args = parser.parse_args()
 
+    # FIXME (arrdem 2018-06-20):
+    #   Should be CLI and config options for setting this
     log.basicConfig(level=log.INFO,
                     format='%(name)-12s: %(levelname)-8s %(message)s')
 

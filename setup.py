@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from setuptools import setup
 
-from giternity import __version__
+from giternity import __doc__, __version__
 
 
 try:
@@ -17,7 +17,7 @@ except:
 setup(
     name="giternity",
     version=__version__,
-    description="Mirror git repositories and retrieve metadata for cgit.",
+    description=__doc__,
     long_description=long_description,
     url="https://github.com/rahiel/giternity",
     license="GPLv3+",

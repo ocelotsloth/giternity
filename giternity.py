@@ -226,7 +226,7 @@ def main():
     git_data_path = trailing_slash(config.get("git_data_path", "/srv/git/"))
     checkout_path = trailing_slash(config.get("checkout_path"))
     cgit_url = trailing_slash(config.get("cgit_url"))
-    checkout_suffix = trailing_slash(config.get("checkout_suffix", ""))
+    checkout_suffix = config.get("checkout_suffix", "")
 
     if args.configure:
         return configure(git_data_path, checkout_path)

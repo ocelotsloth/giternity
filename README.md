@@ -5,10 +5,10 @@
 [![Downloads](https://www.cpu.re/static/giternity/downloads.svg)](https://www.cpu.re/static/giternity/downloads-by-python-version.txt)
 [![License](https://img.shields.io/badge/License-GPLv3+-blue.svg)](https://github.com/rahiel/giternity/blob/master/LICENSE.txt)
 
-Giternity is a tool to mirror git repositories from GitHub. You can specify a
-username/organization to mirror all their repositories, or just individual
-repos. It retrieves some repo metadata so they can be nicely served with
-[cgit][]. Run giternity periodically to update the mirrors.
+Giternity is a tool to mirror git repositories from GitHub.
+You can specify a username/organization to mirror all their repositories, or just individual repos.
+It retrieves some repo metadata so they can be nicely served with [cgit][].
+Run giternity periodically to update the mirrors.
 
 An example result is [git.cpu.re][]. Follow the [tutorial][] to host your own.
 
@@ -28,14 +28,17 @@ You also need to have git installed.
 
 # Configuration
 
-The configuration file is at `/etc/giternity.toml`:
+The configuration file by default is at `/etc/giternity.toml`:
 <!-- TODO: ini should be toml when pygments has toml support -->
-``` ini
+```ini
 # path for the git mirrors
 git_data_path = "/srv/git/"
 
 # path for checkouts of the git mirrors (optional)
 # checkout_path = "/srv/git_checkout/"
+
+# suffix to use for naming repo directories (optional)
+# checkout_suffix = ".git"
 
 # public URL of your cgit instance (optional)
 # cgit_url = "https://git.cpu.re/"
@@ -48,11 +51,12 @@ repositories = [
 ]
 ```
 
-Set `git_data_path` to the path where you want to store the git repositories. It
-will contain bare git repositories: the data you usually see in the `.git`
-directory in your projects. To also have the actual working files of the repos,
-set `checkout_path` to where to keep them. If you'll be hosting the repos with
-cgit, set `cgit_url` to the public URL.
+Set `git_data_path` to the path where you want to store the git
+repositories. It will contain bare git repositories: the data you
+usually see in the `.git` directory in your projects. To also have the
+actual working files of the repos, set `checkout_path` to where to
+keep them. If you'll be hosting the repos with cgit, set `cgit_url` to
+the public URL.
 
 In the `[github]` section you specify which repositories to mirror. You list a
 username (`"rahiel"`) or an organization (`"sunsistemo"`) to mirror all of their

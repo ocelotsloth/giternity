@@ -24,7 +24,7 @@ setup(
 
     python_requires=">=3.5",
     py_modules=["giternity"],
-    install_requires=["requests", "toml"],
+    install_requires=["ansicolors", "requests", "toml"],
     entry_points={"console_scripts": ["giternity=giternity:main"]},
 
     author="Rahiel Kasim",

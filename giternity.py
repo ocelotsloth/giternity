@@ -233,6 +233,9 @@ def main():
 
     if config.get("github") and config["github"].get("repositories"):
         gh = GitHub(cgit_url=cgit_url)
+
+        # FIXME (arrdem 2018-06-20):
+        #   Can this loop be cleaned up at all?
         for r in config["github"]["repositories"]:
             if "/" in r:
                 path = join(git_data_path, "{}{}".format(r, checkout_suffix))

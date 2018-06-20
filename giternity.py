@@ -75,7 +75,7 @@ def mirror(url: str, path: str):
         run(["git", "clone", "--bare", "--mirror", url, path],
             stdout=subprocess.DEVNULL)
 
-    os.makedirs(path + "info/web/", exist_ok=True)
+    os.makedirs(join(path, "info", "web"), exist_ok=True)
 
     # set last modified date
     date = run(["git", "-C", path,

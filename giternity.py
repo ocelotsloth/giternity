@@ -25,7 +25,7 @@ import subprocess
 import sys
 import logging as log
 
-from os.path import exists
+from os.path import exists, join
 from pwd import getpwnam
 from subprocess import CalledProcessError, run
 from typing import Optional
@@ -175,10 +175,18 @@ class GitHub:
 
 
 def trailing_slash(path: Optional[str]):
-    if path:
-        return path if path.endswith("/") else path + "/"
-    else:
+    """Given a None, return a None.
+
+    Given a string, return that string, adding a trailing / if one doesn't already exist.
+    """
+    if path is None:
         return None
+
+    elif path.endswith("/"):
+        return path
+
+    else:
+        return path + "/"
 
 
 parser = argparse.ArgumentParser(
@@ -213,6 +221,8 @@ def main():
               + color(args.config_file, style="bold"))
         sys.exit(1)
 
+    # FIXME (arrdem 2018-06-20):
+    #   All this trailing_slash() nonsense should be replaced with use of join()
     git_data_path = trailing_slash(config.get("git_data_path", "/srv/git/"))
     checkout_path = trailing_slash(config.get("checkout_path"))
     cgit_url = trailing_slash(config.get("cgit_url"))
@@ -225,7 +235,7 @@ def main():
         gh = GitHub(cgit_url=cgit_url)
         for r in config["github"]["repositories"]:
             if "/" in r:
-                path = git_data_path + r + checkout_suffix
+                path = join(git_data_path, "{}{}".format(r, checkout_suffix))
                 log.info("Mirroring repo %s (%s)", r, path)
                 owner, name = r.split("/")
                 url = "https://github.com/{}/{}.git".format(owner, name)
@@ -236,7 +246,7 @@ def main():
             else:
                 log.info("Mirroring group %s", r)
                 for repo in gh.get_repos(r):
-                    path = git_data_path + repo["full_name"] + checkout_suffix
+                    path = join(git_data_path, "{}{}".format(repo["full_name"], checkout_suffix))
                     log.info("Mirroring repo %s (%s)", repo["name"], path)
                     mirror(repo["clone_url"], path)
                     with open(path + "cgitrc", "w") as f:

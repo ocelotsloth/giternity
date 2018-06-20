@@ -75,7 +75,9 @@ def mirror(url: str, path: str):
         run(["git", "clone", "--bare", "--mirror", url, path],
             stdout=subprocess.DEVNULL)
 
-    os.makedirs(join(path, "info", "web"), exist_ok=True)
+    web_dir = join(path, "info", "web")
+
+    os.makedirs(web_dir, exist_ok=True)
 
     # set last modified date
     date = run(["git", "-C", path,
@@ -85,7 +87,7 @@ def mirror(url: str, path: str):
                 "--format='%(authordate:iso8601)'"],
                stdout=subprocess.PIPE)
 
-    with open(path + "info/web/last-modified", "wb") as f:
+    with open(join(web_dir, "last-modified"), "wb") as f:
         f.write(date.stdout)
 
 

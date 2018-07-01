@@ -90,12 +90,16 @@ def is_work_tree(path: str):
 
 
 class GitHub:
-    def __init__(self, cgit_url=None):
+    def __init__(self, cgit_url=None, token=None):
         session = requests.Session()
         session.headers.update({
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "giternity ({})".format(__version__)
         })
+        if token:
+            session.headers.update({
+                "Authorization": "token %s" % token,
+            })
         self.s = session
         self.api = "https://api.github.com"
         self.cgit_url = cgit_url

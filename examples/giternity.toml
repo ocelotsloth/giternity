@@ -1,20 +1,28 @@
-# path for the git mirrors
+# Path for the git mirror directories
 git_data_path = "/srv/git/"
 
-# path for checkouts of the git mirrors (optional)
+# Path for checkouts of the git mirrors (optional)
+# After pulling all remotes, local checkouts will be updated.
 checkout_path = "/srv/git_checkout/"
 
-# suffix to use for naming repo directories (optional, default "")
+# Suffix to use for naming repo directories (optional, default "")
 checkout_suffix = ".git"
 
-# public URL of your cgit instance (optional)
+# Public URL of your cgit instance (optional)
 cgit_url = "https://git.cpu.re/"
 
-# In the `[github]` section, specify which repositories to mirror.
-# Usernames (`"rahiel"`) or an organization (`"sunsistemo"`) to mirror all of their non-fork repositories.
-# Individual repos may be specified too as `owner/repo` (`"TeMPOraL/nyan-mode"`).
-
 [github]
+# Github auth token (optional)
+#
+# Github imposes rate limits on individual IPs unless they are
+# authenticated with a token.
+#
+# https://developer.github.com/v3/#rate-limiting
+token = "SECRET DON'T CHECK THIS IN ANYWHERE"
+
+# List usernames (`"rahiel"`) or an organization (`"sunsistemo"`) to
+# mirror all of their non-fork repositories.  Individual repos may be
+# specified too as `owner/repo` (`"TeMPOraL/nyan-mode"`).
 repositories = [
     "rahiel",
     "sunsistemo",

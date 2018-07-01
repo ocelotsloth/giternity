@@ -109,6 +109,8 @@ class GitHub:
                      .json()
 
     def get_repos(self, user: str):
+        # FIXME (arrdem 2018-07-01):
+        #   while next_page ...
         (data, next_page) = self.get_repos_page(user, 1)
         while next_page:
             (d, next_page) = self.get_repos_page(user, next_page)
@@ -148,6 +150,17 @@ class GitHub:
         return "".join(cgitrc)
 
 
+def find_repos(git_data_path: str, checkout_path: str):
+    for entry in os.scandir(git_data_path):
+        if entry.is_dir():
+            if is_bare_repo(entry.git_data_path):
+                clone(entry.git_data_path,
+                      entry.git_data_path.replace(git_data_path,
+                                                  checkout_path))
+            else:
+                find_repos(entry.git_data_path)
+
+
 parser = argparse.ArgumentParser(
   description="Mirror git repositories and retrieve metadata for cgit.",
   epilog="Homepage: https://github.com/rahiel/giternity")
@@ -161,13 +174,19 @@ parser.add_argument("-c", "--config",
                     dest="config_file",
                     default="/etc/giternity.toml")
 
+parser.add_argument("--dry-run",
+                    help="just print a plan of what to archive where.",
+                    action="store_true",
+                    dest="dry_run",
+                    default=False)
+
 
 def main():
     args = parser.parse_args()
 
     # FIXME (arrdem 2018-06-20):
     #   Should be CLI and config options for setting this
-    log.basicConfig(level=log.INFO,
+    log.basicConfig(level=log.DEBUG,
                     format='%(name)-12s: %(levelname)-8s %(message)s')
 
     try:
@@ -183,42 +202,54 @@ def main():
     cgit_url = config.get("cgit_url")
     checkout_suffix = config.get("checkout_suffix", "")
 
-    if config.get("github") and config["github"].get("repositories"):
-        gh = GitHub(cgit_url=cgit_url)
+    # The plan for what to archive and where it will go
+    archive_plan = []
+
+    gh_config = config.get("github")
+    if gh_config:
+        repos = gh_config.get("repositories", [])
+        token = gh_config.get("token")
+        gh_api = GitHub(cgit_url=cgit_url, token=token)
 
         # FIXME (arrdem 2018-06-20):
         #   Can this loop be cleaned up at all?
-        for r in config["github"]["repositories"]:
-            if "/" in r:
-                path = join(git_data_path, "{}{}".format(r, checkout_suffix))
-                log.info("Mirroring repo %s (%s)", r, path)
-                owner, name = r.split("/")
+        for addr in repos:
+            if "/" in addr:
+                log.debug("Fetching repo %s", addr)
+                path = join(git_data_path,
+                            "{}{}".format(addr, checkout_suffix))
+                owner, name = addr.split("/")
                 url = "https://github.com/{}/{}.git".format(owner, name)
-                repo = gh.get_repo(owner, name)
-                mirror(url, path)
-                with open(join(path, "cgitrc"), "w") as f:
-                    f.write(gh.repo_to_cgitrc(repo))
+                repo = gh_api.get_repo(owner, name)
+                metadata = gh_api.repo_to_cgitrc(repo)
+                archive_plan.append((repo, metadata, url, path))
+
             else:
-                log.info("Mirroring group %s", r)
-                for repo in gh.get_repos(r):
-                    path = join(git_data_path, "{}{}".format(repo["full_name"], checkout_suffix))
-                    log.info("Mirroring repo %s (%s)", repo["name"], path)
-                    mirror(repo["clone_url"], path)
-                    with open(join(path, "cgitrc"), "w") as f:
-                        f.write(gh.repo_to_cgitrc(repo))
+                log.debug("Fetching user/group %s", addr)
+                for repo in gh_api.get_repos(addr):
+                    path = join(git_data_path, "{}{}"
+                                .format(repo["full_name"],
+                                        checkout_suffix))
+                    url = repo["clone_url"]
+                    metadata = gh_api.repo_to_cgitrc(repo)
+                    archive_plan.append((repo, metadata, url, path))
 
-    def find_repos(path: str):
-        for entry in os.scandir(path):
-            if entry.is_dir():
-                if is_bare_repo(entry.path):
-                    clone(entry.path,
-                          entry.path.replace(git_data_path,
-                                             checkout_path))
-                else:
-                    find_repos(entry.path)
+    if args.dry_run:
+        for repo, metadata, url, path in archive_plan:
+            print("""%s (%s) -> %s""" % (repo["full_name"], url, path))
 
-    if checkout_path:
-        find_repos(git_data_path)
+    else:
+        log.info("Mirroring repositories...")
+        for repo, metadata, url, path in archive_plan:
+            mirror(url, path)
+            # FIXME (arrdem 2018-07-01):
+            #   Slurp existing cgitrc and merge with it?
+            with open(join(path, "cgitrc"), "w") as f:
+                f.write(metadata)
+
+        if checkout_path:
+            log.info("Checking out repositories to %s" % checkout_path)
+            find_repos(git_data_path, checkout_path)
 
 
 if __name__ == "__main__":

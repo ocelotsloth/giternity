@@ -28,6 +28,28 @@ Required packages:
 sudo pip3 install giternity
 ```
 
+# Usage
+
+```
+$ giternity --help
+usage: giternity.py [-h] [--version] [--dry-run] [-c CONFIG_FILE]
+                    [--log-level [LOG_LEVEL]]
+
+Mirror git repositories and retrieve metadata for cgit.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --dry-run             show a plan for archiving repositories and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        configuration file for giternity.py
+  --log-level [LOG_LEVEL]
+                        Set the logging output level. ['CRITICAL', 'ERROR',
+                        'WARNING', 'INFO', 'DEBUG']
+
+Homepage: https://github.com/rahiel/giternity
+```
+
 # Configuration
 
 The configuration file by default is located at `/etc/giternity.toml`.

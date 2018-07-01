@@ -15,7 +15,10 @@ cgit_url = "https://git.cpu.re/"
 # Github auth token (optional)
 #
 # Github imposes rate limits on individual IPs unless they are
-# authenticated with a token.
+# authenticated with a token. The ratelimit is generous (60 requests
+# per hour unauthenticated) so you shouldn't need to set this unless
+# you're doing local development or monitoring really a lot of
+# organizations for new repositories.
 #
 # https://developer.github.com/v3/#rate-limiting
 token = "SECRET DON'T CHECK THIS IN ANYWHERE"

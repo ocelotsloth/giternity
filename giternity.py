@@ -161,6 +161,21 @@ def find_repos(git_data_path: str, checkout_path: str):
                 find_repos(entry.git_data_path)
 
 
+_LOG_LEVEL_STRINGS = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+
+
+def _log_level_string_to_int(log_level_string):
+    if log_level_string not in _LOG_LEVEL_STRINGS:
+        raise argparse.ArgumentTypeError(
+          "invalid choice: {0} (choose from {1})"
+          .format(log_level_string,
+                  _LOG_LEVEL_STRINGS))
+
+    log_level_int = getattr(log, log_level_string, log.INFO)
+
+    return log_level_int
+
+
 parser = argparse.ArgumentParser(
   description="Mirror git repositories and retrieve metadata for cgit.",
   epilog="Homepage: https://github.com/rahiel/giternity")
@@ -169,24 +184,30 @@ parser.add_argument("--version",
                     action="version",
                     version="%(prog)s {}".format(__version__))
 
+parser.add_argument("--dry-run",
+                    help="show a plan for archiving repositories and exit",
+                    action="store_true",
+                    dest="dry_run",
+                    default=False)
+
 parser.add_argument("-c", "--config",
                     help="configuration file for %(prog)s",
                     dest="config_file",
                     default="/etc/giternity.toml")
 
-parser.add_argument("--dry-run",
-                    help="just print a plan of what to archive where.",
-                    action="store_true",
-                    dest="dry_run",
-                    default=False)
+parser.add_argument("--log-level",
+                    default="INFO",
+                    dest="log_level",
+                    type=_log_level_string_to_int,
+                    nargs="?",
+                    help=("Set the logging output level. {0}"
+                          .format(_LOG_LEVEL_STRINGS)))
 
 
 def main():
     args = parser.parse_args()
 
-    # FIXME (arrdem 2018-06-20):
-    #   Should be CLI and config options for setting this
-    log.basicConfig(level=log.DEBUG,
+    log.basicConfig(level=args.log_level,
                     format='%(name)-12s: %(levelname)-8s %(message)s')
 
     try:

@@ -31,3 +31,19 @@ repositories = [
     "sunsistemo",
     "TeMPOraL/nyan-mode",
 ]
+
+# Include arbitrary repositories with this pattern (1 [[repos]] block
+# each):
+#
+#    [[repos]]
+#    name = "repo-name"
+#    owner = "owner"
+#    description = "description"
+#    homepage = "https://example.local"
+#    clone_url = "https://git.example.local/owner/repo-name.git"
+[[repos]]
+name = "linux"
+owner = "torvalds"
+description = "Linux Kernel"
+homepage = "https://kernel.org"
+clone_url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"

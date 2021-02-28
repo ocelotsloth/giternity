@@ -254,6 +254,19 @@ def main():
                     url = repo["clone_url"]
                     metadata = gh_api.repo_to_cgitrc(repo)
                     archive_plan.append((repo, metadata, url, path))
+    else:
+        gh_api = GitHub(cgit_url=cgit_url, token='')
+    
+    # Arbitrary git repositories
+    arbitrary_repos = config.get("repos")
+    if arbitrary_repos:
+        for repo in arbitrary_repos:
+            repo['full_name'] = '{}/{}'.format(repo['owner'], repo['name'])
+            log.debug("Configuring repo %s", repo['full_name'])
+            path = "{}{}{}".format(git_data_path, repo['full_name'], checkout_suffix)
+            url = repo["clone_url"]
+            metadata = gh_api.repo_to_cgitrc(repo)
+            archive_plan.append((repo, metadata, url, path))
 
     if args.dry_run:
         for repo, metadata, url, path in archive_plan:
